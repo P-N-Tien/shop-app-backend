@@ -1,0 +1,160 @@
+######## APPLICATION ##########
+app:
+  security:
+    cors:
+      allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
+      allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
+      max-age: 3600
+
+  # Clean JWT Token expired
+  scheduling:
+    cleanup-interval-ms: 7200000
+    cleanup-cron: "0 0 2 * * *"
+
+######## Server ##########
+server:
+  port: 8080
+  tomcat:
+    threads:
+      max: 200 # max worker threads
+      min-spare: 10 # available worker threads
+      accept-count: 100 # queue
+    connection-timeout: 20000 # 20s timeout
+    keep-alive-timeout: 60000 # 60s
+    mbeanregistry:
+      enabled: true
+
+######## Spring Core ##########
+spring:
+  application:
+    name: shop-app
+
+  profiles:
+    active: dev
+
+  ######## Database & Connection Pool ##########
+  datasource:
+    url: jdbc:postgresql://localhost:5432/shop_app
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 15
+      minimum-idle: 5
+      idle-timeout: 600000 # 6' The amount of time a connection is allowed to remain idle in the pool before being closed.
+      max-lifetime: 1000000 # 10' The maximum lifespan of a connection.
+      connection-timeout: 5000 # 5s The maximum time a thread can wait to "borrow" a connection from the pool.
+      leak-detection-threshold: 2000 # 2s
+
+  ######## JPA & Hibernate ##########
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    #    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  ######## Flyway (Database Migration) ##########
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  ######## Redis ##########
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      connect-timeout: 5000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+
+  ######### Servlet & Upload ##########
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+######## Custom API Config ##########
+
+api:
+  prefix: /api/v1
+
+######## JWT Security ##########
+
+jwt:
+  access-expiration: 15m # (15')
+  refresh-expiration: 30d # (7 days)
+  secret: "${JWT_SECRET:ZbOPfJy7kkNwdb1e4BMmdi19LA8nySe1aCNSwXQli2s=}"
+  access:
+    cookie-name: access_token
+    expiry: 15m
+    path: "/"
+    same-site: Strict
+    httpOnly: true
+    secure: false
+  refresh:
+    cookie-name: refresh_token
+    expiry: 30d
+    path: /api/v1/auth
+    same-site: Strict
+    httpOnly: true
+    secure: false
+
+######## Logging ##########
+
+logging:
+  level:
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+######## Metrics ##########
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    metrics:
+      enabled: true
+
+######## PAYMENTS ##########
+
+vn-pay:
+  api-url: https://sandbox.vnpayment.vn
+  hash-secret: YOUR_VNPAY_HASH_SECRET
+
+  # Group 1: Fixed Key-Value pairs (passed directly into the Map)
+  fixed-params:
+    vnp_Version: 2.1.0
+    vnp_Command: pay
+    vnp_TmnCode: ABCDEF12 # Lấy trực tiếp từ đây
+    vnp_BankCode: VNPAYQR # VNPAYQR, VNBANK, INTCARD
+    vnp_CurrCode: VND
+    vnp_OrderType: other
+    vnp_Locale: vn
+    vnp_ReturnUrl: https://your-domain.com
+
+  # Group 2: Define Key names for fields requiring dynamic logic.
+  field-names:
+    amount: vnp_Amount
+    txn-ref: vnp_TxnRef
+    order-info: vnp_OrderInfo
+    ip-address: vnp_IpAddr
+    create-date: vnp_CreateDate
+    expire-date: vnp_ExpireDate
+    secure-hash: vnp_SecureHash
+
+  # Logical Auxiliary Configuration
+  config:
+    expire-minutes: 15
+    timezone: Asia/Ho_Chi_Minh
