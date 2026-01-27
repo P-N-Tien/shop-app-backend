@@ -61,7 +61,7 @@ public class AuthServiceImp implements AuthService {
 
         // 3. The role default is "USER"
         Role defaultRole = roleRepository
-                .findByName(UserRole.USER.getValue())
+                .findByName(UserRole.USER)
                 .orElseThrow(() ->
                         new SystemException(ErrorCode.INTERNAL_ERROR.getMessage()));
 
@@ -110,7 +110,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     @Transactional
     public TokenPair refreshToken(String refreshToken) {
-        
+
         // 1. Validate token (expired, format)
         if (refreshToken == null || !jwtService.isRefreshTokenValid(refreshToken)) {
             throw new InvalidTokenException("Invalid or expired refresh token");

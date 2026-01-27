@@ -14,11 +14,11 @@ import lombok.*;
 public class ProductImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_images_id_gen")
     @SequenceGenerator(
-            name = "product_images_seq",
-            sequenceName = "product_images_sequence",
-            allocationSize = 10,
+            name = "product_images_id_gen",
+            sequenceName = "product_images_id_seq",
+            allocationSize = 50,
             initialValue = 1
     )
     private Long id;

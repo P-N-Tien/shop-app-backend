@@ -27,6 +27,12 @@ import java.util.List;
 @Builder
 public class Order extends BaseEntity {
 
+    @Id
+    @EqualsAndHashCode.Include
+    @Setter(AccessLevel.NONE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Builder.Default
     @Column(name = "total_money", nullable = false)
     private BigDecimal totalMoney = BigDecimal.ZERO;

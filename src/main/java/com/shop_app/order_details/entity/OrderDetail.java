@@ -17,9 +17,13 @@ import java.math.BigDecimal;
 @Table(name = "order_details")
 public class OrderDetail {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @EqualsAndHashCode.Include
-    @Setter(AccessLevel.NONE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_details_gen")
+    @SequenceGenerator(
+            name = "order_details_gen",
+            sequenceName = "order_details_id_seq",
+            allocationSize = 50,
+            initialValue = 1
+    )
     private Long id;
 
     // save the product name for history

@@ -1,5 +1,0 @@
-ALTER TABLE users
-    DROP COLUMN is_active CASCADE;
-
-ALTER TABLE users
-    ADD COLUMN status VARCHAR(50) DEFAULT '';

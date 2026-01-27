@@ -20,8 +20,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payment {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_id_gen")
+    @SequenceGenerator(
+            name = "payment_id_gen",
+            sequenceName = "payments_id_seq",
+            allocationSize = 50,
+            initialValue = 1
+    )
     private Long id;
 
     @Column(name = "amount", nullable = false, precision = 19, scale = 2)
