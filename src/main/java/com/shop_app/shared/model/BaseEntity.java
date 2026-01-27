@@ -17,11 +17,6 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public abstract class BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @EqualsAndHashCode.Include
-    @Setter(AccessLevel.NONE)
-    private Long id;
 
     @CreationTimestamp
     @Column(name = "created_at")

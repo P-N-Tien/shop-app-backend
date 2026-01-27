@@ -2,7 +2,6 @@ package com.shop_app.user.entity;
 
 import com.shop_app.role.entity.Role;
 import com.shop_app.shared.model.BaseEntity;
-import com.shop_app.token.model.Token;
 import com.shop_app.order.entity.Order;
 import com.shop_app.user.enums.UserStatus;
 import jakarta.persistence.*;
@@ -23,6 +22,12 @@ import java.util.Set;
 @ToString(exclude = {"orders", "tokens"})
 public class User extends BaseEntity {
 
+    @Id
+    @Setter(AccessLevel.NONE)
+    @EqualsAndHashCode.Include
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
@@ -35,8 +40,8 @@ public class User extends BaseEntity {
     @Column(name = "address", length = 200)
     private String address;
 
-    @Column(name = "status")
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private UserStatus status;
 
     @Column(name = "date_of_birth")
@@ -44,9 +49,6 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
-
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)

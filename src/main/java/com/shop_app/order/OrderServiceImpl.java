@@ -10,10 +10,8 @@ import com.shop_app.order.response.CheckoutResponse;
 import com.shop_app.order.response.OrderResponse;
 import com.shop_app.order.validator.OrderValidator;
 import com.shop_app.order_details.entity.OrderDetail;
-import com.shop_app.payment.PaymentRepository;
 import com.shop_app.payment.PaymentService;
 import com.shop_app.payment.entity.Payment;
-import com.shop_app.payment.enums.PaymentStatus;
 import com.shop_app.payment.response.PaymentResponse;
 import com.shop_app.product.entity.Product;
 import com.shop_app.product.enums.ProductStatus;
@@ -30,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,7 +35,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements IOrderService {
     private final OrderRepository orderRepository;
-    private final PaymentRepository paymentRepository;
     private final OrderMapper orderMapper;
     private final PaymentService paymentService;
     private final UserValidator userValidator;

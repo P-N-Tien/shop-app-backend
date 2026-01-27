@@ -36,9 +36,9 @@ spring:
 
   ######## Database & Connection Pool ##########
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/shop_app}
+    username: ${SPRING_DATASOURCE_USERNAME:admin}
+    password: ${SPRING_DATASOURCE_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 15
@@ -51,7 +51,7 @@ spring:
   ######## JPA & Hibernate ##########
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     #    open-in-view: false
     properties:
@@ -59,6 +59,7 @@ spring:
         format_sql: true
 
   ######## Flyway (Database Migration) ##########
+
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -68,8 +69,8 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
       connect-timeout: 5000
       lettuce:
         pool:
@@ -93,7 +94,7 @@ api:
 jwt:
   access-expiration: 15m # (15')
   refresh-expiration: 30d # (7 days)
-  secret: "${JWT_SECRET:ZbOPfJy7kkNwdb1e4BMmdi19LA8nySe1aCNSwXQli2s=}"
+  secret: ${JWT_SECRET:ZbOPfJy7kkNwdb1e4BMmdi19LA8nySe1aCNSwXQli2s=}
   access:
     cookie-name: access_token
     expiry: 15m

@@ -23,6 +23,12 @@ import java.util.List;
 @ToString(callSuper = true, exclude = {"category", "orderDetails", "productImages"})
 public class Product extends BaseEntity {
 
+    @Id
+    @Setter(AccessLevel.NONE)
+    @EqualsAndHashCode.Include
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "name", nullable = false, unique = true, length = 255)
     private String name;
 
@@ -38,9 +44,6 @@ public class Product extends BaseEntity {
     @Column(name = "status", length = 10)
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
-   
-    @Column(name = "has_variant")
-    private boolean hasVariant;
 
     @OneToMany(mappedBy = "product")
     private List<ProductImage> productImages;

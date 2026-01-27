@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @RequiredArgsConstructor
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class OrderConcurrencyTest {
-    
+
     private final IOrderService orderService;
     private final InventoryRepository inventoryRepository;
     private final InventoryValidator inventoryValidator;
@@ -61,7 +61,7 @@ class OrderConcurrencyTest {
                 .recipientAddress("New York")
                 .recipientPhone("092312312")
                 .note("Hang de vo")
-                .paymentMethod(PaymentMethod.VN_PAY)
+                .paymentMethod(PaymentMethod.VNPAY)
                 .items(List.of(itemRequest1))
                 .userId(userId)
                 .build();

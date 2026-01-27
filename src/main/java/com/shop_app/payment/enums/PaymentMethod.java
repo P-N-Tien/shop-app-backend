@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentMethod {
-    VN_PAY("VN_PAY"),
+    VNPAY("VNPAY"),
     COD("COD"),
     MOMO("MOMO");
 

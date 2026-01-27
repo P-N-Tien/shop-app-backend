@@ -18,6 +18,12 @@ import lombok.*;
 @ToString(exclude = {"product"})
 public class Inventory extends BaseEntity {
 
+    @Id
+    @EqualsAndHashCode.Include
+    @Setter(AccessLevel.NONE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     /**
      * Enabel/Disable version when using OPTIMISTIC/PESSIMISTIC LOCK
      */

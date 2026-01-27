@@ -12,6 +12,8 @@ import lombok.*;
 public class Role {
 
     @Id
+    @EqualsAndHashCode.Include
+    @Setter(AccessLevel.NONE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

@@ -15,7 +15,7 @@ public class VNPayPaymentStrategy implements PaymentStrategy {
 
     @Override
     public PaymentMethod getMethod() {
-        return PaymentMethod.VN_PAY;
+        return PaymentMethod.VNPAY;
     }
 
     @Override

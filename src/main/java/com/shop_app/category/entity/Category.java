@@ -20,13 +20,7 @@ public class Category {
     @Id
     @EqualsAndHashCode.Include
     @Setter(AccessLevel.NONE)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(
-            name = "category_seq",
-            sequenceName = "category_sequence",
-            allocationSize = 20,
-            initialValue = 1
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false, unique = true)
