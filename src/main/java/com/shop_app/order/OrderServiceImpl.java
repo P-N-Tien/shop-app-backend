@@ -15,7 +15,6 @@ import com.shop_app.payment.entity.Payment;
 import com.shop_app.payment.response.PaymentResponse;
 import com.shop_app.product.entity.Product;
 import com.shop_app.product.enums.ProductStatus;
-import com.shop_app.product.redis.ProductRedis;
 import com.shop_app.inventory.strategy.IReserveInventoryService;
 import com.shop_app.product.validator.ProductValidator;
 import com.shop_app.shared.validate.Validate;
@@ -40,7 +39,7 @@ public class OrderServiceImpl implements IOrderService {
     private final UserValidator userValidator;
     private final ProductValidator productValidator;
     private final OrderValidator orderValidator;
-    private final ProductRedis productRedis;
+    //    private final ProductRedis productRedis;
     private final IReserveInventoryService reserveStockService;
 
     @Override
@@ -57,7 +56,7 @@ public class OrderServiceImpl implements IOrderService {
         for (ItemRequest item : req.items()) {
 
             // 3. Atomic Decrease stock in REDIS
-            productRedis.decreaseRedisStock(item);
+//            productRedis.decreaseRedisStock(item);
 
             Product product = productValidator.validateAndGet(item.getProductId());
 

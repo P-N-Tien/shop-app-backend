@@ -10,20 +10,23 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
-@RequiredArgsConstructor
-public class InventoryPreloadRunner implements ApplicationRunner {
+//@Component
+//@RequiredArgsConstructor
+public class InventoryPreloadRunner
+//        implements ApplicationRunner
 
-    private final InventoryRepository inventoryRepository;
-    private final RedisTemplate<String, Long> redisTemplate;
+{
 
-    @Override
-    public void run(ApplicationArguments args) {
-        List<Inventory> inventories = inventoryRepository.findAll();
+//    private final InventoryRepository inventoryRepository;
+//    private final RedisTemplate<String, Long> redisTemplate;
 
-        for (Inventory s : inventories) {
-            redisTemplate.opsForValue()
-                    .set("stock:" + s.getProductId(), (long) s.getQuantity());
-        }
-    }
+//    @Override
+//    public void run(ApplicationArguments args) {
+//        List<Inventory> inventories = inventoryRepository.findAll();
+//
+//        for (Inventory s : inventories) {
+//            redisTemplate.opsForValue()
+//                    .set("stock:" + s.getProductId(), (long) s.getQuantity());
+//        }
+//    }
 }

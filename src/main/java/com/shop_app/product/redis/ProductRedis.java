@@ -10,25 +10,26 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@RequiredArgsConstructor
-@Component
+//@Component
+//@RequiredArgsConstructor
 public class ProductRedis {
-    private final RedisTemplate<String, Long> redisTemplate;
-    private final DefaultRedisScript<Long> inventoryDecreaseScript;
 
-    public void decreaseRedisStock(ItemRequest item) {
-        Validate.requiredNonNull(item, "ItemRequest must be not null");
-
-        String stockKey = "stock:" + item.getProductId();
-
-        Long result = redisTemplate.execute(
-                inventoryDecreaseScript,
-                List.of(stockKey),
-                item.getQuantity()
-        );
-
-        if (result == null || result < 0) {
-            throw new OutOfInventoryException("Out of inventory");
-        }
-    }
+//    private final RedisTemplate<String, Long> redisTemplate;
+//    private final DefaultRedisScript<Long> inventoryDecreaseScript;
+//
+//    public void decreaseRedisStock(ItemRequest item) {
+//        Validate.requiredNonNull(item, "ItemRequest must be not null");
+//
+//        String stockKey = "stock:" + item.getProductId();
+//
+//        Long result = redisTemplate.execute(
+//                inventoryDecreaseScript,
+//                List.of(stockKey),
+//                item.getQuantity()
+//        );
+//
+//        if (result == null || result < 0) {
+//            throw new OutOfInventoryException("Out of inventory");
+//        }
+//    }
 }

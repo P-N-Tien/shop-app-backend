@@ -51,7 +51,7 @@ spring:
   ######## JPA & Hibernate ##########
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: true
     #    open-in-view: false
     properties:
@@ -69,6 +69,7 @@ spring:
 
   data:
     redis:
+      enable: false
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
       connect-timeout: 5000
