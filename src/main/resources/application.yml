@@ -51,7 +51,7 @@ spring:
   ######## JPA & Hibernate ##########
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
     show-sql: true
     #    open-in-view: false
     properties:
