@@ -33,12 +33,21 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment createPayment(Order order) {
         Validate.requiredNonNull(order, "Order must not be null");
 
+        PaymentStatus initialStatus = PaymentStatus.PENDING;
+        String txIdPrefix = "TX-";
+
+        if (order.getPaymentMethod() == PaymentMethod.COD) {
+            // For COD, keep the status as PENDING until payment is recivied from the shipper
+            initialStatus = PaymentStatus.PENDING;
+            txIdPrefix = "COD-";
+        }
+
         Payment payment = Payment.builder()
                 .order(order)
                 .amount(order.getTotalMoney())
-                .status(PaymentStatus.PENDING)
+                .status(initialStatus)
                 .method(order.getPaymentMethod())
-                .transactionId(UUID.randomUUID().toString())
+                .transactionId(txIdPrefix + UUID.randomUUID().toString().substring(0, 8))
                 .build();
 
         paymentRepository.save(payment);

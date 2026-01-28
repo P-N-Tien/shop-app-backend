@@ -34,7 +34,7 @@ public class Order extends BaseEntity {
     private Long id;
 
     @Builder.Default
-    @Column(name = "total_money", nullable = false)
+    @Column(name = "total_money", nullable = false, precision = 19, scale = 2)
     private BigDecimal totalMoney = BigDecimal.ZERO;
 
     @Column(name = "recipient_name", nullable = false, length = 100)

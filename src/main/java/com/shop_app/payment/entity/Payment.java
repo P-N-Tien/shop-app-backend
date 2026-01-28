@@ -42,7 +42,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    @Column(name = "transaction_id", nullable = false, length = 50)
+    @Column(name = "transaction_id", nullable = true, length = 50)
     private String transactionId;
 
     @Column(name = "bank_code", length = 50)

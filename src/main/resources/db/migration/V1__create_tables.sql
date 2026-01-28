@@ -98,16 +98,16 @@ CREATE TABLE order_details
 CREATE TABLE payments
 (
     id             BIGINT PRIMARY KEY DEFAULT nextval('payments_id_seq'),
-    transaction_id VARCHAR(50)    NOT NULL,
+    transaction_id VARCHAR(50),
     method         VARCHAR(20)    NOT NULL,
     status         VARCHAR(20)    NOT NULL,
     amount         NUMERIC(19, 2) NOT NULL,
-    bank_code      VARCHAR(50)    NOT NULL,
-    card_type      VARCHAR(50)    NOT NULL,
-    response_code  VARCHAR(20)    NOT NULL,
-    failure_reason VARCHAR(100)   NOT NULL,
+    bank_code      VARCHAR(50),
+    card_type      VARCHAR(50),
+    response_code  VARCHAR(20),
+    failure_reason VARCHAR(100),
     metadata       TEXT,
-    payment_time   TIMESTAMP      NOT NULL,
+    payment_time   TIMESTAMP,
     order_id       BIGINT         NOT NULL,
     CONSTRAINT fk_payment_order FOREIGN KEY (order_id) REFERENCES orders (id)
 );
