@@ -63,7 +63,6 @@ class OrderConcurrencyTest {
                 .note("Hang de vo")
                 .paymentMethod(PaymentMethod.VNPAY)
                 .items(List.of(itemRequest1))
-                .userId(userId)
                 .build();
 
         // Create 100 worker-threads run concurrency

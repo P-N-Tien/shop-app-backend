@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ProductValidator {
@@ -16,10 +15,12 @@ public class ProductValidator {
 
     public Product validateAndGet(long id) {
         return repository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("[PRODUCT][NOT_FOUND] id={}", id);
-                    return new NotFoundException("Product not found with id: " + id);
-                });
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + id));
+    }
+
+    public Product getByName(String name) {
+        return repository.findByName(name)
+                .orElseThrow(() -> new NotFoundException("Product not found with name: " + name));
     }
 
     public void validateDuplicateName(String name) {

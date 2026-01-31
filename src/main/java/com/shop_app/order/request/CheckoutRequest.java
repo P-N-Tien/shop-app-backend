@@ -10,12 +10,8 @@ import lombok.Builder;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Builder
 public record CheckoutRequest(
-        @NotNull(message = "User' Id is required")
-        @Min(value = 1, message = "User' Id must be greater or equal 1")
-        Long userId,
 
         @NotBlank(message = "Recipient Name is required")
         String recipientName,

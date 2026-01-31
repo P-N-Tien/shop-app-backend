@@ -40,6 +40,12 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
       # Automatically update the DB
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # CORS
+      ALLOWED_ORIGINS: http://localhost:3000
+      FILE_UPLOAD_DIR: /var/lib/data/uploads
+
+      # VNPay
+      VNPAY_RETURN_URL: http://localhost:3000/vnpay_payment_channel
 
 volumes:
   postgres_data:

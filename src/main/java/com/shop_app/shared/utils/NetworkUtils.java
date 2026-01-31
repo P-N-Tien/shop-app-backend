@@ -16,7 +16,6 @@ public class NetworkUtils {
             if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
                 ip = request.getRemoteAddr();
             }
-            
             return ip;
         }
         return "0.0.0.0";

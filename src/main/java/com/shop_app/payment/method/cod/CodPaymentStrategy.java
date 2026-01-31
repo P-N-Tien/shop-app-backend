@@ -20,7 +20,7 @@ public class CodPaymentStrategy implements PaymentStrategy {
         return PaymentResponse.builder()
                 .status(PaymentStatus.SUCCESS)
                 .message("Order placed successfully. Payment upon delivery.")
-                .paymentUrl("")
+                .url("")
                 .build();
     }
 }

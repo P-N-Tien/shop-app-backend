@@ -30,7 +30,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         // 1. Log error (Sử dụng SLF4J/Logback)
         log.error("Unauthorized error: {}", accessDeniedException.getMessage());
-
+    
         // 2. Get language by Header "Accept-Language"
         Locale locale = LocaleContextHolder.getLocale();
         String errorMessage = messageSource.getMessage("auth.unauthorized", null, locale);

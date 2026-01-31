@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record PaymentResponse(
         PaymentStatus status,
-        String paymentUrl,
+        String url,
         String message
 ) {
 

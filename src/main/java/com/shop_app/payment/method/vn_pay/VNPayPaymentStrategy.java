@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class VNPayPaymentStrategy implements PaymentStrategy {
 
-    private final VNPayService vnPayService;
+    private final VNPayServiceImpl vnPayService;
 
     @Override
     public PaymentMethod getMethod() {

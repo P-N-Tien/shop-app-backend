@@ -1,24 +1,32 @@
 package com.shop_app.order.response;
 
 import com.shop_app.order.enums.OrderStatus;
-import com.shop_app.order_details.entity.OrderDetail;
+import com.shop_app.order_details.OrderDetailResponse;
 import com.shop_app.payment.enums.PaymentMethod;
-import com.shop_app.shared.dto.BaseResponse;
-import lombok.*;
+import lombok.Builder;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-public class OrderResponse extends BaseResponse {
-    private String recipientName;
-    private BigDecimal totalMoney;
-    private String recipientPhone;
-    private String recipientAddress;
-    private String note;
-    private PaymentMethod paymentMethod;
-    private OrderStatus status;
-    private List<OrderDetail> orderDetails = new ArrayList<>();
+@Builder
+public record OrderResponse(
+        Long id,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        String recipientName,
+        BigDecimal totalMoney,
+        String recipientPhone,
+        String recipientAddress,
+        String note,
+        PaymentMethod paymentMethod,
+        OrderStatus status,
+        List<OrderDetailResponse> orderDetails
+) {
+    // Compact constructor để đảm bảo list không bao giờ null
+    public OrderResponse {
+        if (orderDetails == null) {
+            orderDetails = List.of();
+        }
+    }
 }

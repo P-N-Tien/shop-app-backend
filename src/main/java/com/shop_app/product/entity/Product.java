@@ -45,7 +45,8 @@ public class Product extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    @OrderBy("sortOrder ASC")
     private List<ProductImage> productImages;
 
     @OneToMany(mappedBy = "product")

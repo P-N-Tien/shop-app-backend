@@ -15,16 +15,7 @@ public record UserRegisterRequest(
 
         @NotBlank(message = "Password is required")
         @Size(min = 6, message = "Password must have more than 6 character")
-        String password,
-
-        @NotBlank(message = "Confirm password is required")
-        @Size(min = 6, message = "Confirm password must have more than 6 character")
-        String confirmPassword,
-
-        @Past(message = "Date of birth must be a past day")
-        LocalDate dateOfBirth,
-
-        String address
+        String password
 ) {
 }
 

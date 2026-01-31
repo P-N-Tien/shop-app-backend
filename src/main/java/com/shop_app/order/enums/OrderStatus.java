@@ -1,9 +1,10 @@
 package com.shop_app.order.enums;
 
 public enum OrderStatus {
-    PENDING_PAYMENT,
+    PENDING,
     PAID,
     COMPLETED,
     CANCELLED,
+    FAILED,
     REFUNDED;
 }

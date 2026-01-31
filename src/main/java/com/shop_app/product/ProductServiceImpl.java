@@ -2,8 +2,7 @@ package com.shop_app.product;
 
 import com.shop_app.category.validator.CategoryValidator;
 import com.shop_app.product.enums.ProductStatus;
-import com.shop_app.product.images.IProductImageService;
-import com.shop_app.product.images.ProductImageServiceImpl;
+import com.shop_app.product.images.ProductImageService;
 import com.shop_app.product.mapper.ProductMapper;
 import com.shop_app.product.request.ProductCreateRequest;
 import com.shop_app.product.request.ProductFilterRequest;
@@ -13,6 +12,8 @@ import com.shop_app.product.specification.ProductSpecifications;
 import com.shop_app.product.validator.ProductValidator;
 import com.shop_app.category.entity.Category;
 import com.shop_app.product.entity.Product;
+import com.shop_app.shared.dto.PageResponse;
+import com.shop_app.shared.exceptions.SystemException;
 import com.shop_app.shared.validate.Validate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,11 +33,11 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
-    private final ProductRepository productRepository;
+    private final ProductRepository repository;
     private final CategoryValidator categoryValidator;
     private final ProductValidator productValidator;
     private final ProductMapper productMapper;
-    private final IProductImageService productImageService;
+    private final ProductImageService productImageService;
 
     /**
      * Creates a product and its related metadata atomically.
@@ -51,28 +51,29 @@ public class ProductServiceImpl implements IProductService {
     @Transactional
     public void create(ProductCreateRequest req) {
         Validate.requiredNonNull(req, "Product request must be not null");
+        try {
+            // 1. Validate req
+            productValidator.validateDuplicateName(req.getName());
+            Category getCategory = categoryValidator.validateAndGet(req.getCategoryId());
 
-        productValidator.validateDuplicateName(req.getName());
+            // 2. Map to entity
+            Product product = productMapper.createFrom(req);
+            product.setCategory(getCategory);
 
-        Category category = categoryValidator.validateAndGet(req.getCategoryId());
+            // 3. Save db
+            Product saved = repository.save(product);
 
-        // MapStruct
-        Product product = productMapper.createFrom(req);
-        product.setCategory(category);
+            // 4. Handle save product images
+            productImageService.handleSaveFiles(req.getFiles(), saved);
 
-        Product saved = productRepository.saveAndFlush(product);
+            log.info("[PRODUCT][CREATE] Success: id={} name={}", saved.getId(), saved.getName());
 
-        // Persist image metadata inside transaction.
-        // Actual file upload is deferred and triggered AFTER commit
-        // to avoid orphan files in case of rollback.
-        productImageService.save(req.getFiles(), saved);
-
-        // handle upload images after transaction commit
-        productImageService.handleUploadImages(req.getFiles(), saved);
-
-        log.info("[PRODUCT][CREATE] id={} name={}", saved.getId(), saved.getName());
+        } catch (Exception e) {
+            log.error("[PRODUCT][FAILED] Error when creating Product : {}", req.getName(), e);
+            throw new SystemException("Error when creating Product: " + e.getMessage());
+        }
     }
-    
+
     /**
      * Partial Update
      * <p>
@@ -121,22 +122,54 @@ public class ProductServiceImpl implements IProductService {
         return productMapper.toResponse(productValidator.validateAndGet(id));
     }
 
+    @Override
+    public ProductResponse getByName(String name) {
+        return productMapper.toResponse(productValidator.getByName(name));
+    }
+
+    @Override
+    public PageResponse<ProductResponse> getProducts(
+            Long categoryId,
+            int page,
+            int limit
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                limit,
+                Sort.by("createdAt").descending()
+        );
+
+        Page<Product> products;
+
+        if (categoryId == null) {
+            products = repository.findAllActiveWithPrimaryImage(pageable);
+        } else {
+            products = repository.findByCategory(categoryId, pageable);
+        }
+
+        Page<ProductResponse> responsePage = products.map(productMapper::toResponse);
+
+        return PageResponse.from(responsePage);
+    }
+
     /**
      * Search products using dynamic specification filters.
      */
     @Override
-    public Page<ProductResponse> search(ProductFilterRequest filter,
-                                        Pageable pageRequest) {
+    public PageResponse<ProductResponse> search(ProductFilterRequest filter,
+                                                Pageable pageRequest) {
         Pageable pageable = createPageable(pageRequest);
         Specification<Product> spec = ProductSpecifications.filter(filter);
 
-        return productRepository.findAll(spec, pageable)
-                .map(productMapper::toResponse);
+        Page<ProductResponse> responsePage = repository
+                .findAll(spec, pageable).map(productMapper::toResponse);
+
+        return PageResponse.from(responsePage);
     }
 
     @Override
     public boolean existByName(String name) {
-        return productRepository.existsByName(name);
+        return repository.existsByName(name);
     }
 
     // ============ HELPER METHODS ============== //
@@ -154,7 +187,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     public List<Product> findAllByIdInList(List<Long> productIds) {
-        return productRepository.findAllByIdIn(productIds);
+        return repository.findAllByIdIn(productIds);
     }
 }
 

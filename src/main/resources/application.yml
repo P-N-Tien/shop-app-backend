@@ -3,15 +3,20 @@ app:
   security:
     cors:
       allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
-      allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
-      allowed-headers: "*"
-      allow-credentials: true
-      max-age: 3600
 
   # Clean JWT Token expired
   scheduling:
     cleanup-interval-ms: 7200000
     cleanup-cron: "0 0 2 * * *"
+
+  file-upload:
+    upload-dir: ${FILE_UPLOAD_DIR:uploads}
+    max-file-size: 52428800 # 50MB
+    allowed-content-types:
+      - "image/jpeg"
+      - "image/png"
+      - "image/gif"
+      - "image/webp"
 
 ######## Server ##########
 server:
@@ -132,19 +137,19 @@ management:
 ######## PAYMENTS ##########
 
 vn-pay:
-  api-url: https://sandbox.vnpayment.vn
-  hash-secret: YOUR_VNPAY_HASH_SECRET
+  api-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  hash-secret: VGUBFP7AZ58LA7POQG728TPZMJ6IVQNK
 
   # Group 1: Fixed Key-Value pairs (passed directly into the Map)
   fixed-params:
     vnp_Version: 2.1.0
     vnp_Command: pay
-    vnp_TmnCode: ABCDEF12 # Lấy trực tiếp từ đây
-    vnp_BankCode: VNPAYQR # VNPAYQR, VNBANK, INTCARD
+    vnp_TmnCode: NWHX9M1F
+    #    vnp_BankCode: VNPAYQR # VNPAYQR, VNBANK, INTCARD
     vnp_CurrCode: VND
     vnp_OrderType: other
     vnp_Locale: vn
-    vnp_ReturnUrl: https://your-domain.com
+    vnp_ReturnUrl: ${VNPAY_RETURN_URL:http://localhost:3000/vnpay_payment_channel}
 
   # Group 2: Define Key names for fields requiring dynamic logic.
   field-names:
@@ -159,4 +164,4 @@ vn-pay:
   # Logical Auxiliary Configuration
   config:
     expire-minutes: 15
-    timezone: Asia/Ho_Chi_Minh
+    timezone: Etc/GMT+7
