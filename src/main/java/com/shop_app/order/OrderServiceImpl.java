@@ -17,6 +17,7 @@ import com.shop_app.product.entity.Product;
 import com.shop_app.product.enums.ProductStatus;
 import com.shop_app.inventory.strategy.IReserveInventoryService;
 import com.shop_app.product.validator.ProductValidator;
+import com.shop_app.shared.utils.SecurityUtils;
 import com.shop_app.shared.validate.Validate;
 import com.shop_app.user.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -84,8 +85,8 @@ public class OrderServiceImpl implements IOrderService {
         }
 
         // 6. Complete order
-        order.setUser(userValidator.validateAndGet(req.userId()));
-        order.setStatus(OrderStatus.PENDING_PAYMENT);
+        order.setUser(userValidator.validateAndGet(SecurityUtils.getCurrentUserId()));
+        order.setStatus(OrderStatus.PENDING);
         order.setTotalMoney(totalSum);
 
         Order savedOrder = orderRepository.save(order);
@@ -93,8 +94,9 @@ public class OrderServiceImpl implements IOrderService {
         log.info("[ORDER][CREATE] Create Order successful with id={} userId={}",
                 savedOrder.getId(), savedOrder.getUserId());
 
-        // create a payment record (VNPAY) with PENDING
+        // Create a payment record (VNPAY) with PENDING
         Payment payment = paymentService.createPayment(savedOrder);
+        // Create a link to redirect the user to VNPay Web
         PaymentResponse paymentResponse = paymentService.processPayment(
                 order.getPaymentMethod(), payment
         );
@@ -103,7 +105,7 @@ public class OrderServiceImpl implements IOrderService {
                 order.getId(),
                 req.paymentMethod(),
                 paymentResponse.status(),
-                paymentResponse.paymentUrl(),
+                paymentResponse.url(),
                 paymentResponse.message()
         );
     }

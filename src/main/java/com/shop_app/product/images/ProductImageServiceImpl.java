@@ -1,53 +1,66 @@
 package com.shop_app.product.images;
 
-import com.shop_app.product.images.event.ProductImagesUploadEvent;
+import com.shop_app.file_local.FileLocalUploadService;
 import com.shop_app.shared.exceptions.InvalidParamException;
 import com.shop_app.product.entity.Product;
 import com.shop_app.product.images.entity.ProductImage;
+import com.shop_app.shared.validate.Validate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProductImageServiceImpl implements IProductImageService {
+public class ProductImageServiceImpl implements ProductImageService {
     private static final int MAX_IMAGES_PER_PRODUCT = 5;
-    private final ProductImageRepository productImageRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ProductImageRepository repository;
+    private final FileLocalUploadService fileUploadService;
 
     @Override
-    @Transactional
-    public void save(List<MultipartFile> files, Product product) {
-        if (files != null && !files.isEmpty() && product != null) {
-            throwIfMaxImages(product, files.size());
-            List<ProductImage> images = toProductImages(files, product);
+    @Transactional(rollbackFor = {Exception.class})
+    public void handleSaveFiles(List<MultipartFile> files, Product product)
+            throws Exception {
+        // 1. Validate inputs
+        Validate.notEmpty(files, "Files must not be null or empty");
+        Validate.requiredNonNull(product, "Product must not be null");
+        validateFileSize(product, files.size());
 
-            productImageRepository.saveAll(images);
+        // 2. Maintain element order during insertion
+        Map<MultipartFile, String> fileToNameMap = new LinkedHashMap<>();
 
-            log.info("[PRODUCT_IMAGES][CREATE]");
+        // 3. Generate unique filenames to avoid conflicts.
+        for (MultipartFile file : files) {
+            if (fileUploadService.isValidFiles(file)) {
+                fileToNameMap.put(file, fileUploadService.generateUniqueFileName(file));
+            }
         }
+
+        // 4. Save files to disk(Physical storage) first
+        // If an IOException occurs here, the transaction hasn't commited, so no DB impact
+        for (Map.Entry<MultipartFile, String> entry : fileToNameMap.entrySet()) {
+            fileUploadService.storeFile(entry.getKey(), entry.getValue());
+        }
+
+        // 5. Map to entities and persist to database
+        List<ProductImage> productImages = fileToNameMap.values().stream()
+                .map(fileName -> ProductImage.builder()
+                        .product(product)
+                        .imageUrl(fileName)
+                        .build())
+                .toList();
+
+        repository.saveAll(productImages);
     }
 
-    @Override
-    public void handleUploadImages(List<MultipartFile> files,
-                                   Product product) {
-
-        if (product != null && files != null && !files.isEmpty())
-            eventPublisher.publishEvent(
-                    new ProductImagesUploadEvent(this, product, files)
-            );
-    }
-
-    private void throwIfMaxImages(Product product, int newFileCount) {
-        int currentCount = productImageRepository.countByProduct(product);
+    private void validateFileSize(Product product, int newFileCount) {
+        int currentCount = repository.countByProduct(product);
         int totalAfterUpload = currentCount + newFileCount;
 
         if (totalAfterUpload > MAX_IMAGES_PER_PRODUCT)
@@ -55,16 +68,5 @@ public class ProductImageServiceImpl implements IProductImageService {
                     String.format("A maximum of %d images per product is allowed.",
                             MAX_IMAGES_PER_PRODUCT)
             );
-    }
-
-    private List<ProductImage> toProductImages(
-            List<MultipartFile> files, Product product) {
-        return files.stream()
-                .filter(Objects::nonNull)
-                .map((file) -> ProductImage.builder()
-                        .imageUrl(file.getOriginalFilename())
-                        .product(product)
-                        .build())
-                .collect(Collectors.toList());
     }
 }

@@ -37,6 +37,6 @@ public class ProductCreateRequest {
     private String thumbnail;
     private String description;
 
-    @Schema(description = "png, jpg, jpeg", example = "image.png")
+    @Schema(description = "png, jpg, jpeg, webp", example = "image.png")
     private List<MultipartFile> files;
 }

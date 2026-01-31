@@ -14,6 +14,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface ProductMapper {
+    @Mapping(target = "images", source = "productImages")
+    @Mapping(target = "categoryId", source = "category.id")
     ProductResponse toResponse(Product product);
 
     @Mapping(target = "category", ignore = true)

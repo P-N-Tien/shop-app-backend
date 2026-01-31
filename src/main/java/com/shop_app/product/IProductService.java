@@ -5,18 +5,21 @@ import com.shop_app.product.entity.Product;
 import com.shop_app.product.request.ProductFilterRequest;
 import com.shop_app.product.request.ProductPatchRequest;
 import com.shop_app.product.response.ProductResponse;
-import org.springframework.data.domain.Page;
+import com.shop_app.shared.dto.PageResponse;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
-
-import java.io.IOException;
-import java.util.List;
 
 public interface IProductService {
-    //    ProductsPagingResponse getAll(Pageable pageable);
+    PageResponse<ProductResponse> getProducts(
+            Long categoryId,
+            int page,
+            int limit
+    );
+
     void create(ProductCreateRequest product);
 
     ProductResponse getById(long id);
+
+    ProductResponse getByName(String name);
 
     void partialUpdate(long id, ProductPatchRequest product);
 
@@ -24,10 +27,8 @@ public interface IProductService {
 
     boolean existByName(String name);
 
-    Page<ProductResponse> search(
+    PageResponse<ProductResponse> search(
             ProductFilterRequest filter,
             Pageable pageable
     );
-
-    List<Product> findAllByIdInList(List<Long> productIds);
 }

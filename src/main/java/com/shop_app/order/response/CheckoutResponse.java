@@ -7,7 +7,7 @@ import com.shop_app.payment.enums.PaymentStatus;
  * "orderId": 1002,
  * "paymentMethod": "VNPAY",
  * "paymentStatus": "PENDING",
- * "paymentUrl": "https://sandbox.vnpayment.vn/...",
+ * "url": "https://sandbox.vnpayment.vn/...",
  * "message": "Redirect to VNPay to make payment"
  */
 public record CheckoutResponse(

@@ -5,12 +5,14 @@ import com.shop_app.product.request.ProductCreateRequest;
 import com.shop_app.product.request.ProductFilterRequest;
 import com.shop_app.product.request.ProductPatchRequest;
 import com.shop_app.product.response.ProductResponse;
+import com.shop_app.shared.dto.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -56,9 +58,9 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Search & Paging")
     @GetMapping("/search")
-    public ResponseEntity<?> search(
+    @Operation(summary = "Search & Paging")
+    public ResponseEntity<PageResponse<ProductResponse>> search(
             ProductFilterRequest filter,
             @PageableDefault(
                     page = 0, size = 20,
@@ -69,17 +71,33 @@ public class ProductController {
         return ResponseEntity.ok(productService.search(filter, pageable));
     }
 
-    @Operation(summary = "Get Product by Id")
+    @GetMapping
+    public ResponseEntity<PageResponse<ProductResponse>> getProducts(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int limit
+    ) {
+        return ResponseEntity.ok(productService.getProducts(categoryId, page, limit));
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getById(@PathVariable long id) {
+    @Operation(summary = "Get Product by Id")
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable long id) {
         return ResponseEntity.ok(productService.getById(id));
+    }
+
+    @GetMapping("/details")
+    @Operation(summary = "Get Product by Name")
+    public ResponseEntity<ProductResponse> getProductByName(
+            @RequestParam String name) {
+        return ResponseEntity.ok(productService.getByName(name));
     }
 
     @PostMapping("/generate-dummy-products")
     private ResponseEntity<Void> generateDummyProducts(
     ) {
         Faker faker = new Faker();
-        for (int i = 0; i < 10_000_000; i++) {
+        for (int i = 0; i < 100; i++) {
             String productName = faker.commerce().productName();
             if (productService.existByName(productName)) {
                 continue;

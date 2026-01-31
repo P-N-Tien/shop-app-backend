@@ -11,7 +11,6 @@ import com.shop_app.role.RoleRepository;
 import com.shop_app.role.entity.Role;
 import com.shop_app.role.enums.UserRole;
 import com.shop_app.shared.exceptions.DuplicateException;
-import com.shop_app.shared.exceptions.InvalidParamException;
 import com.shop_app.shared.exceptions.SystemException;
 import com.shop_app.shared.exceptions.enums.ErrorCode;
 import com.shop_app.shared.validate.Validate;
@@ -49,37 +48,31 @@ public class AuthServiceImp implements AuthService {
     public void register(UserRegisterRequest req) {
         Validate.requiredNonNull(req, "User register request must be not null");
 
-        // 1. Confirm-password and password must match
-        if (!req.password().equals(req.confirmPassword())) {
-            throw new InvalidParamException("Confirm Password not match");
-        }
-
-        // 2.  Check if phone number already exist
+        // 1.  Check if phone number already exist
         if (userValidator.existsByPhone(req.phoneNumber())) {
             throw new DuplicateException("Phone Number has already been registered");
         }
 
-        // 3. The role default is "USER"
+        // 2. The role default is "USER"
         Role defaultRole = roleRepository
                 .findByName(UserRole.USER)
                 .orElseThrow(() ->
                         new SystemException(ErrorCode.INTERNAL_ERROR.getMessage()));
 
-        // 4. Map DTO to Entity
+        // 3. Map DTO to Entity
         User newUser = User.builder()
                 .phoneNumber(req.phoneNumber())
                 .fullName(req.fullName())
                 .password(passwordEncoder.encode(req.password())) // encode pwd
-                .dateOfBirth(req.dateOfBirth())
-                .address(req.address())
                 .status(UserStatus.ACTIVE) // The register status must be "ACTIVE"
                 .build();
 
         newUser.addRole(defaultRole);
 
-        // 5. Flush to db
+        // 4. Flush to db
         userRepository.save(newUser);
 
+        // 5. Log
         log.info("[AUTH][REGISTER] User register successful with ID: {}", newUser.getId());
     }
 

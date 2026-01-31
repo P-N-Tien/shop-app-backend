@@ -1,6 +1,5 @@
 package com.shop_app.user.request;
 
-import com.shop_app.user.validator.PasswordMatches;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +8,6 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@PasswordMatches
 public class UserPatchRequest {
 
     private String fullName;
