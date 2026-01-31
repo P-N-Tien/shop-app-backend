@@ -98,12 +98,12 @@ api:
 ######## JWT Security ##########
 
 jwt:
-  access-expiration: 5s # (15')
+  access-expiration: 15m # (15')
   refresh-expiration: 30d # (7 days)
   secret: ${JWT_SECRET:ZbOPfJy7kkNwdb1e4BMmdi19LA8nySe1aCNSwXQli2s=}
   access:
     cookie-name: access_token
-    expiry: 5s
+    expiry: 15m
     path: "/"
     same-site: Strict
     httpOnly: true
