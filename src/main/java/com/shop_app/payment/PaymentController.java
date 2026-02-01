@@ -1,7 +1,6 @@
 package com.shop_app.payment;
 
-import com.shop_app.payment.method.vn_pay.VNPayIPNResponse;
-import com.shop_app.payment.method.vn_pay.VNPayUtil;
+import com.shop_app.payment.method.vn_pay.response.VNPayIPNResponse;
 import com.shop_app.payment.method.vn_pay.VnpayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,4 +27,6 @@ public class PaymentController {
         log.info("VNPAY IPN Response: {}", response);
         return ResponseEntity.ok(response);
     }
+
+
 }

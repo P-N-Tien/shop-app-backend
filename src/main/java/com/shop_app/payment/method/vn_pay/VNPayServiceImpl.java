@@ -7,6 +7,8 @@ import com.shop_app.payment.PaymentRepository;
 import com.shop_app.payment.entity.Payment;
 import com.shop_app.payment.enums.PaymentStatus;
 import com.shop_app.payment.exceptions.PaymentException;
+import com.shop_app.payment.method.vn_pay.response.VNPayIPNResponse;
+import com.shop_app.payment.method.vn_pay.response.VNPayValidateResponse;
 import com.shop_app.payment.response.PaymentResponse;
 import com.shop_app.shared.utils.NetworkUtils;
 import lombok.RequiredArgsConstructor;
@@ -110,31 +112,70 @@ public class VNPayServiceImpl implements VnpayService {
     }
 
     @Override
-    @Transactional
-    public VNPayIPNResponse processIPN(Map<String, String> params) {
+    public VNPayValidateResponse validatePayment(Map<String, String> params) {
         try {
-            String vnp_SecureHash = params.get("vnp_SecureHash");
+            String vnpSecureHash = params.get("vnp_SecureHash");
             Map<String, String> fields = new HashMap<>(params);
             fields.remove("vnp_SecureHashType");
             fields.remove("vnp_SecureHash");
 
-            // 1. Check Checksum (Code 97)
-            String signValue = vnPayUtil.hashAllFields(fields);
-            if (signValue.equals(vnp_SecureHash)) {
-                return new VNPayIPNResponse("97", "Invalid Checksum");
+            if (!vnPayUtil.verifySignature(fields, vnpSecureHash)) {
+                return new VNPayValidateResponse(false, "Payment Fail");
             }
+
             String txnRef = params.get("vnp_TxnRef");
             long vnpAmount = Long.parseLong(params.get("vnp_Amount"));
             String responseCode = params.get("vnp_ResponseCode");
-
-            System.out.println("vnpAmount: " + vnpAmount);
-            System.out.println("txnRef: " + txnRef);
 
             // 2. Check order has exists (code: 01)
             return paymentRepository.findByTransactionId(txnRef)
                     .map(payment -> {
                         Order order = payment.getOrder();
-                        System.out.println("payment: " + payment);
+
+                        // 3. Check money (code: 04) - VNPay x100
+                        long dbAmountX100 = order.getTotalMoney()
+                                .multiply(new BigDecimal(100))
+                                .longValue();
+
+                        if (!OrderStatus.PENDING.equals(order.getStatus())
+                                || dbAmountX100 != vnpAmount
+                                || !"00".equals(responseCode)) {
+                            return new VNPayValidateResponse(false, "Payment Fail");
+                        }
+
+                        return new VNPayValidateResponse(true, "Confirm Success");
+                    })
+                    .orElse(new VNPayValidateResponse(false, "Payment Fail"));
+
+        } catch (Exception e) {
+            return new VNPayValidateResponse(true, "Confirm Success");
+        }
+    }
+
+    @Override
+    @Transactional
+    public VNPayIPNResponse processIPN(Map<String, String> params) {
+        try {
+            String vnpSecureHash = params.get("vnp_SecureHash");
+            Map<String, String> fields = new HashMap<>(params);
+            fields.remove("vnp_SecureHashType");
+            fields.remove("vnp_SecureHash");
+            System.out.println("vnpSecureHash: " + vnpSecureHash);
+
+            // 1. Check Checksum (Code 97)
+
+            if (!vnPayUtil.verifySignature(fields, vnpSecureHash)) {
+                return new VNPayIPNResponse("97", "Invalid Checksum");
+            }
+
+            String txnRef = params.get("vnp_TxnRef");
+            long vnpAmount = Long.parseLong(params.get("vnp_Amount"));
+            String responseCode = params.get("vnp_ResponseCode");
+
+            // 2. Check order has exists (code: 01)
+            return paymentRepository.findByTransactionId(txnRef)
+                    .map(payment -> {
+                        Order order = payment.getOrder();
 
                         // 3. Check money (code: 04) - VNPay x100
                         long dbAmountX100 = order.getTotalMoney()
@@ -150,7 +191,7 @@ public class VNPayServiceImpl implements VnpayService {
                             return new VNPayIPNResponse("02", "Order already confirmed");
                         }
 
-                        // 5. Update result (code: 00)
+                        // 5. Update Status
                         if ("00".equals(responseCode)) {
                             order.setStatus(OrderStatus.PAID);
                             payment.setStatus(PaymentStatus.SUCCESS);
@@ -161,6 +202,7 @@ public class VNPayServiceImpl implements VnpayService {
 
                         orderRepository.save(order);
                         paymentRepository.save(payment);
+
                         return new VNPayIPNResponse("00", "Confirm Success");
                     })
                     .orElse(new VNPayIPNResponse("01", "Order not Found (Transaction Code invalid)"));
