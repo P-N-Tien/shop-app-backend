@@ -105,14 +105,14 @@ jwt:
     cookie-name: access_token
     expiry: 15m
     path: "/"
-    same-site: Lax
+    same-site: ${SAME_SITE:Lax}
     httpOnly: true
     secure: false
   refresh:
     cookie-name: refresh_token
     expiry: 30d
     path: "/api/v1/auth"
-    same-site: Lax
+    same-site: ${SAME_SITE:Lax}
     httpOnly: true
     secure: false
 
