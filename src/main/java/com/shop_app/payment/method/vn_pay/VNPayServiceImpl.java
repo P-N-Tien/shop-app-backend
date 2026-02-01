@@ -119,18 +119,22 @@ public class VNPayServiceImpl implements VnpayService {
             fields.remove("vnp_SecureHash");
 
             // 1. Check Checksum (Code 97)
-            if (!vnPayUtil.verifySignature(fields, vnp_SecureHash)) {
+            String signValue = vnPayUtil.hashAllFields(fields);
+            if (signValue.equals(vnp_SecureHash)) {
                 return new VNPayIPNResponse("97", "Invalid Checksum");
             }
-
             String txnRef = params.get("vnp_TxnRef");
             long vnpAmount = Long.parseLong(params.get("vnp_Amount"));
             String responseCode = params.get("vnp_ResponseCode");
+
+            System.out.println("vnpAmount: " + vnpAmount);
+            System.out.println("txnRef: " + txnRef);
 
             // 2. Check order has exists (code: 01)
             return paymentRepository.findByTransactionId(txnRef)
                     .map(payment -> {
                         Order order = payment.getOrder();
+                        System.out.println("payment: " + payment);
 
                         // 3. Check money (code: 04) - VNPay x100
                         long dbAmountX100 = order.getTotalMoney()
@@ -149,11 +153,14 @@ public class VNPayServiceImpl implements VnpayService {
                         // 5. Update result (code: 00)
                         if ("00".equals(responseCode)) {
                             order.setStatus(OrderStatus.PAID);
+                            payment.setStatus(PaymentStatus.SUCCESS);
                         } else {
                             order.setStatus(OrderStatus.FAILED);
+                            payment.setStatus(PaymentStatus.FAILED);
                         }
 
                         orderRepository.save(order);
+                        paymentRepository.save(payment);
                         return new VNPayIPNResponse("00", "Confirm Success");
                     })
                     .orElse(new VNPayIPNResponse("01", "Order not Found (Transaction Code invalid)"));

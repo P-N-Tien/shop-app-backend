@@ -70,7 +70,8 @@ public class VNPayUtil {
     public boolean verifySignature(@NonNull Map<String, String> fields, String secureHash) {
         String rawData = fields.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
-                .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
+                .filter(entry -> entry.getValue() != null
+                        && !entry.getValue().isEmpty())
                 .map(entry -> entry.getKey() + "=" +
                         URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII))
                 .collect(Collectors.joining("&"));
