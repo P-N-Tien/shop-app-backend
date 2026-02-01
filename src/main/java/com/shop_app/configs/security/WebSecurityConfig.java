@@ -22,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -38,7 +39,6 @@ public class WebSecurityConfig {
 
     @Value("${app.security.cors.allowed-origins}")
     private String allowedOrigins;
-
     @Value("${api.prefix}")
     private String prefix;
 
@@ -51,7 +51,7 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of(allowedOrigins));
+                    config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
