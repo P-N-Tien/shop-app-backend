@@ -49,7 +49,6 @@ public class RefreshTokenService implements IRefreshTokenService {
     @Transactional
     public void revoke(UUID jti) {
         Validate.requiredNonNull(jti, "JWT ID must not be null");
-
         RefreshToken refreshToken = refreshTokenRepository.findById(jti)
                 .orElseThrow(() -> new NotFoundException("Refresh token not found"));
 
