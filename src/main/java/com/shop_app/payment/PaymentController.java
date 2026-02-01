@@ -6,10 +6,7 @@ import com.shop_app.payment.method.vn_pay.response.VNPayValidateResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -20,7 +17,7 @@ public class PaymentController {
 
     private final VnpayService vnpayService;
 
-    @GetMapping("/IPN")
+    @RequestMapping(value = "/IPN", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<VNPayIPNResponse> vnpayIPN(@RequestParam Map<String, String> allParams) {
         log.info("VNPAY IPN Request: {}", allParams);
         var response = vnpayService.processIPN(allParams);
