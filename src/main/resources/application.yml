@@ -107,14 +107,14 @@ jwt:
     path: "/"
     same-site: ${SAME_SITE:Lax}
     httpOnly: true
-    secure: false
+    secure: true
   refresh:
     cookie-name: refresh_token
     expiry: 30d
     path: "/api/v1/auth"
     same-site: ${SAME_SITE:Lax}
     httpOnly: true
-    secure: false
+    secure: true
 
 ######## Logging ##########
 
