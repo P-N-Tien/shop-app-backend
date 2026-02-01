@@ -60,15 +60,18 @@ public class VNPayServiceImpl implements VnpayService {
             vnpParams.put(fieldNames.ipAddress(), NetworkUtils.getClientIp());
 
             // Timezone: Etc/GMT+7
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(config.timezone()));
-            SimpleDateFormat formatter = new SimpleDateFormat(VNP_DATE_FORMATTER);
-            String createDate = formatter.format(calendar.getTime());
+            // Get TimeZone from config
+            TimeZone tz = TimeZone.getTimeZone(config.timezone());
 
+            Calendar calendar = Calendar.getInstance(tz);
+            SimpleDateFormat formatter = new SimpleDateFormat(VNP_DATE_FORMATTER);
+
+            formatter.setTimeZone(tz);
+
+            String createDate = formatter.format(calendar.getTime());
             vnpParams.put(fieldNames.createDate(), createDate);
 
-            // ExpireMinute: 15m
             calendar.add(Calendar.MINUTE, config.expireMinutes());
-
             String expireDate = formatter.format(calendar.getTime());
             vnpParams.put(fieldNames.expireDate(), expireDate);
 
