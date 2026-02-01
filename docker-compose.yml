@@ -46,6 +46,8 @@ services:
 
       # VNPay
       VNPAY_RETURN_URL: http://localhost:3000/vnpay_payment_channel
+      #
+      SAME_SITE: Lax
 
 volumes:
   postgres_data:
