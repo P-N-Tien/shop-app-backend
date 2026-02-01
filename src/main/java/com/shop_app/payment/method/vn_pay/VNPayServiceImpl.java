@@ -63,14 +63,17 @@ public class VNPayServiceImpl implements VnpayService {
             // Get TimeZone from config
             TimeZone tz = TimeZone.getTimeZone(config.timezone());
 
+            // Initial Calendar with this TimeZone
             Calendar calendar = Calendar.getInstance(tz);
             SimpleDateFormat formatter = new SimpleDateFormat(VNP_DATE_FORMATTER);
 
+            // Must set TimeZone for formatter
             formatter.setTimeZone(tz);
 
             String createDate = formatter.format(calendar.getTime());
             vnpParams.put(fieldNames.createDate(), createDate);
 
+            // Add 15 minutes
             calendar.add(Calendar.MINUTE, config.expireMinutes());
             String expireDate = formatter.format(calendar.getTime());
             vnpParams.put(fieldNames.expireDate(), expireDate);
@@ -125,7 +128,7 @@ public class VNPayServiceImpl implements VnpayService {
             String responseCode = params.get("vnp_ResponseCode");
 
             // 2. Check order has exists (code: 01)
-            return paymentRepository.findBytransactionId(txnRef)
+            return paymentRepository.findByTransactionId(txnRef)
                     .map(payment -> {
                         Order order = payment.getOrder();
 
