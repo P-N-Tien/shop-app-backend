@@ -164,4 +164,4 @@ vn-pay:
   # Logical Auxiliary Configuration
   config:
     expire-minutes: 15
-    timezone: Etc/GMT+7
+    timezone: Asia/Ho_Chi_Minh
