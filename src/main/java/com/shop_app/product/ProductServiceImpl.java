@@ -2,7 +2,6 @@ package com.shop_app.product;
 
 import com.shop_app.category.validator.CategoryValidator;
 import com.shop_app.product.enums.ProductStatus;
-import com.shop_app.product.images.ProductImageService;
 import com.shop_app.product.mapper.ProductMapper;
 import com.shop_app.product.request.ProductCreateRequest;
 import com.shop_app.product.request.ProductFilterRequest;
@@ -26,7 +25,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -37,15 +35,9 @@ public class ProductServiceImpl implements IProductService {
     private final CategoryValidator categoryValidator;
     private final ProductValidator productValidator;
     private final ProductMapper productMapper;
-    private final ProductImageService productImageService;
 
     /**
      * Creates a product and its related metadata atomically.
-     * <p>
-     * Transaction scope:
-     * - Product and image metadata are persisted together.
-     * - File upload is executed asynchronously AFTER commit.
-     * </p>
      */
     @Override
     @Transactional
@@ -62,9 +54,6 @@ public class ProductServiceImpl implements IProductService {
 
             // 3. Save db
             Product saved = repository.save(product);
-
-            // 4. Handle save product images
-            productImageService.handleSaveFiles(req.getFiles(), saved);
 
             log.info("[PRODUCT][CREATE] Success: id={} name={}", saved.getId(), saved.getName());
 
@@ -142,7 +131,7 @@ public class ProductServiceImpl implements IProductService {
         Page<Product> products;
 
         if (categoryId == null) {
-            products = repository.findAllActiveWithPrimaryImage(pageable);
+            products = repository.findAll(pageable);
         } else {
             products = repository.findByCategory(categoryId, pageable);
         }
@@ -168,8 +157,20 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public void deleteProductImage(long productId, long imageId) {
+
+    }
+
+    @Override
     public boolean existByName(String name) {
         return repository.existsByName(name);
+    }
+
+    @Override
+    public void updateProductThumbnail(long productId, String imageUrl) {
+        Product product = productValidator.validateAndGet(productId);
+        product.setThumbnailUrl(imageUrl);
+        repository.save(product);
     }
 
     // ============ HELPER METHODS ============== //
@@ -184,10 +185,6 @@ public class ProductServiceImpl implements IProductService {
         return PageRequest.of(
                 page.getPageNumber(), page.getPageSize(), page.getSort()
         );
-    }
-
-    public List<Product> findAllByIdInList(List<Long> productIds) {
-        return repository.findAllByIdIn(productIds);
     }
 }
 

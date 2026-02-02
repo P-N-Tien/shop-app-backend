@@ -1,6 +1,8 @@
 package com.shop_app.product;
 
 import com.github.javafaker.Faker;
+import com.shop_app.images.ProductImageService;
+import com.shop_app.images.ProductImagesRequest;
 import com.shop_app.product.request.ProductCreateRequest;
 import com.shop_app.product.request.ProductFilterRequest;
 import com.shop_app.product.request.ProductPatchRequest;
@@ -20,8 +22,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Tag(name = "Products", description = "API for managing products")
 @RestController
@@ -29,6 +33,7 @@ import java.math.BigDecimal;
 @RequestMapping("${api.prefix}/products")
 public class ProductController {
     private final IProductService productService;
+    private final ProductImageService productImageService;
 
     @Operation(summary = "Create product")
     @ApiResponses(value = {
@@ -111,5 +116,14 @@ public class ProductController {
             productService.create(req);
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping(value = "/uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<ProductImagesRequest>> uploadProductImages(
+            @RequestParam(value = "productId") Long productId,
+            @RequestParam(value = "files") MultipartFile[] files,
+            @RequestParam(value = "primaryIndex") int primaryIndex) {
+        return ResponseEntity.ok(
+                productImageService.uploadProductImages(productId, files, primaryIndex));
     }
 }

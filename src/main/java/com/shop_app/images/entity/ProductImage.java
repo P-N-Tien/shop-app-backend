@@ -1,4 +1,4 @@
-package com.shop_app.product.images.entity;
+package com.shop_app.images.entity;
 
 import com.shop_app.product.entity.Product;
 import jakarta.persistence.*;
@@ -31,7 +31,7 @@ public class ProductImage {
     private String imageUrl;
 
     @Column(name = "is_primary", nullable = false)
-    private boolean isPrimary = false;
+    private Boolean isPrimary;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

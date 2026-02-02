@@ -3,7 +3,7 @@ package com.shop_app.product.entity;
 import com.shop_app.category.entity.Category;
 import com.shop_app.product.enums.ProductStatus;
 import com.shop_app.shared.model.BaseEntity;
-import com.shop_app.product.images.entity.ProductImage;
+import com.shop_app.images.entity.ProductImage;
 import com.shop_app.order_details.entity.OrderDetail;
 import com.shop_app.inventory.entity.Inventory;
 import jakarta.persistence.*;

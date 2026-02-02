@@ -10,7 +10,6 @@ app:
     cleanup-cron: "0 0 2 * * *"
 
   file-upload:
-    upload-dir: ${FILE_UPLOAD_DIR:uploads}
     max-file-size: 52428800 # 50MB
     allowed-content-types:
       - "image/jpeg"
@@ -165,3 +164,9 @@ vn-pay:
   config:
     expire-minutes: 15
     timezone: Asia/Ho_Chi_Minh
+
+# Cloudinary
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:dwrco1qc5}
+  api-key: ${CLOUDINARY_API_KEY:764672533743872}
+  api-secret: ${CLOUDINARY_API_SECRET:UB7xjix0ovIR0jvQGGRFE5Rgp6Y}

@@ -31,7 +31,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>,
                 SELECT p FROM Product p 
                 LEFT JOIN FETCH p.productImages i 
                 WHERE p.status = 'ACTIVE' 
-                AND (i.isPrimary = TRUE OR i.id IS NULL)
+                AND i.isPrimary = TRUE
             """)
     Page<Product> findAllActiveWithPrimaryImage(Pageable pageable);
 

@@ -1,12 +1,15 @@
 package com.shop_app.product;
 
+import com.shop_app.images.ProductImagesRequest;
 import com.shop_app.product.request.ProductCreateRequest;
-import com.shop_app.product.entity.Product;
 import com.shop_app.product.request.ProductFilterRequest;
 import com.shop_app.product.request.ProductPatchRequest;
 import com.shop_app.product.response.ProductResponse;
 import com.shop_app.shared.dto.PageResponse;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface IProductService {
     PageResponse<ProductResponse> getProducts(
@@ -31,4 +34,8 @@ public interface IProductService {
             ProductFilterRequest filter,
             Pageable pageable
     );
+
+    void updateProductThumbnail(long productId, String imageUrl);
+    
+    void deleteProductImage(long productId, long imageId);
 }

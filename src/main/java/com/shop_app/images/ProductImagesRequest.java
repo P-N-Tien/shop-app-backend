@@ -1,10 +1,11 @@
-package com.shop_app.product.images;
+package com.shop_app.images;
 
 import lombok.Builder;
 
 @Builder
-public record ProductImagesResponse(
+public record ProductImagesRequest(
         Long id,
+        Long productId,
         String imageUrl,
         Boolean isPrimary,
         Integer sortOrder

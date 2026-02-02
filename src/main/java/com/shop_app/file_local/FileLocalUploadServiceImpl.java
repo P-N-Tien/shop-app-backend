@@ -1,7 +1,6 @@
 package com.shop_app.file_local;
 
 import com.shop_app.shared.validate.Validate;
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,6 @@ import java.util.Set;
 @Setter
 @Slf4j
 @Service
-@ConfigurationProperties(prefix = "app.file-upload")
 public class FileLocalUploadServiceImpl implements FileLocalUploadService {
     private String uploadDir;
     private long maxFileSize;
@@ -48,20 +46,5 @@ public class FileLocalUploadServiceImpl implements FileLocalUploadService {
         String originalFilename = file.getOriginalFilename();
         String cleanName = (originalFilename != null) ? originalFilename.replaceAll("\\s+", "_") : "file";
         return String.format("%s-%s", timestamp, cleanName);
-    }
-
-    @PostConstruct
-    public void init() {
-        try {
-            // Using the absolute path
-            Path dirPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-            if (Files.notExists(dirPath)) {
-                Files.createDirectories(dirPath);
-                log.info("[FILE-INIT] Created upload directory at: {}", dirPath);
-            }
-        } catch (IOException e) {
-            log.error("[FILE-INIT] Error when creating directory : {}", e.getMessage());
-            throw new RuntimeException("Could not create upload directory", e);
-        }
     }
 }
