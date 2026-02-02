@@ -120,7 +120,7 @@ public class VNPayServiceImpl implements VnpayService {
             fields.remove("vnp_SecureHash");
 
             if (!vnPayUtil.verifySignature(fields, vnpSecureHash)) {
-                return new VNPayValidateResponse(false, "Payment Fail");
+                return new VNPayValidateResponse(false, "Invalid security signature", PaymentStatus.FAILED);
             }
 
             String txnRef = params.get("vnp_TxnRef");
@@ -128,27 +128,37 @@ public class VNPayServiceImpl implements VnpayService {
             String responseCode = params.get("vnp_ResponseCode");
 
             // 2. Check order has exists (code: 01)
+            if (!"00".equals(responseCode)) {
+                return new VNPayValidateResponse(true, "Transaction failed or cancelled by user", PaymentStatus.FAILED);
+            }
+
+            // 3. Find transaction in DB
             return paymentRepository.findByTransactionId(txnRef)
                     .map(payment -> {
                         Order order = payment.getOrder();
 
-                        // 3. Check money (code: 04) - VNPay x100
+                        // Validate order money is the same in db
                         long dbAmountX100 = order.getTotalMoney()
                                 .multiply(new BigDecimal(100))
                                 .longValue();
 
-                        if (!OrderStatus.PENDING.equals(order.getStatus())
-                                || dbAmountX100 != vnpAmount
-                                || !"00".equals(responseCode)) {
-                            return new VNPayValidateResponse(false, "Payment Fail");
+                        if (dbAmountX100 != vnpAmount || !(payment.getTransactionId().equals(txnRef))) {
+                            return new VNPayValidateResponse(true, "Amount mismatch", PaymentStatus.FAILED);
                         }
 
-                        return new VNPayValidateResponse(true, "Confirm Success");
+                        return switch (order.getStatus()) {
+                            case PAID -> new VNPayValidateResponse(true, "Payment successful", PaymentStatus.SUCCESS);
+                            case CANCELLED, FAILED ->
+                                    new VNPayValidateResponse(true, "Payment failed", PaymentStatus.FAILED);
+                            case PENDING ->
+                                    new VNPayValidateResponse(true, "Waiting for confirmation", PaymentStatus.PENDING);
+                            default -> new VNPayValidateResponse(true, "Unknown status", PaymentStatus.FAILED);
+                        };
                     })
-                    .orElse(new VNPayValidateResponse(false, "Payment Fail"));
+                    .orElse(new VNPayValidateResponse(true, "Payment failed", PaymentStatus.FAILED));
 
         } catch (Exception e) {
-            return new VNPayValidateResponse(true, "Confirm Success");
+            return new VNPayValidateResponse(false, "Payment failed", PaymentStatus.FAILED);
         }
     }
 

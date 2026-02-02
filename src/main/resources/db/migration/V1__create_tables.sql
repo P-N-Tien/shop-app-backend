@@ -51,6 +51,8 @@ CREATE TABLE product_images
     id         INT PRIMARY KEY DEFAULT nextval('product_images_id_seq'),
     image_url  VARCHAR(300) NOT NULL,
     product_id BIGINT       NOT NULL,
+    sort_order INT             DEFAULT 0,
+    is_primary BOOLEAN         DEFAULT FALSE,
     CONSTRAINT fk_img_product FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
