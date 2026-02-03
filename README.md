@@ -9,7 +9,7 @@ secure JWT authentication to complex order processing and payment integration.
 > The backend is hosted on a free tier on Render; please wait a few minutes for the server to restart if the API is
 > initially unresponsive.
 
-## Tech Stack
+### Tech Stack
 
 Language: Java 22 (Latest features)
 Framework: Spring Boot 3.4.4
@@ -19,7 +19,7 @@ Media Management: Cloudinary (Product images storage)
 DevOps: Docker & Docker Compose
 Deployment: Render
 
-## Key Features
+### Key Features
 
 Security: State-of-the-art authentication with JWT and secure Cookie handling.
 RESTful APIs: Clean and scalable endpoints for Categories, Products, and Orders.
@@ -27,17 +27,18 @@ Payment Integration: Ready-to-use logic for VNPay and COD workflows.
 Image Processing: Automatic image upload and optimization via Cloudinary API.
 Containerization: Fully Dockerized for "write once, run anywhere" convenience.
 
-## Running with Docker
+### Running with Docker
 
 Quickly spin up the entire environment (Backend + Postgres) using Docker Compose:
 
 docker-compose up -d
 
-## Local Installation
+### Local Installation
 
 Clone the project:
 
 > git clone git@github.com:P-N-Tien/shop-app-backend.git
+>
 > cd shop-app-backend
 
 
