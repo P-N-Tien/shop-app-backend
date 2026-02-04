@@ -2,7 +2,6 @@ package com.shop_app.configs.interceptor;
 
 import com.shop_app.idempotency.IdempotencyService;
 import com.shop_app.idempotency.IdempotencyKey;
-import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +56,7 @@ public class IdempotencyInterceptor implements HandlerInterceptor {
             log.warn("[IDEMPOTENCY][DUPLICATE] Request for keyId: {} is already in progress.", keyId);
 
             response.sendError(HttpStatus.CONFLICT.value(), e.getMessage());
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
             return false;
         }
     }
