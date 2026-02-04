@@ -6,8 +6,11 @@ secure JWT authentication to complex order processing and payment integration.
 > 🔗 Live API: https://shop-app-mdax.onrender.com
 
 > [!NOTE]
-> The backend is hosted on a free tier on Render; please wait a few minutes for the server to restart if the API is
-> initially unresponsive.
+> When you payment order by VNPay using this information:
+> Bank Card Number: 9704198526191432198
+> Cardholder Name: NGUYEN VAN A
+> Issue Date: 07/15
+> OTP Password: 123456
 
 ### Tech Stack
 
@@ -26,12 +29,6 @@ RESTful APIs: Clean and scalable endpoints for Categories, Products, and Orders.
 Payment Integration: Ready-to-use logic for VNPay and COD workflows.
 Image Processing: Automatic image upload and optimization via Cloudinary API.
 Containerization: Fully Dockerized for "write once, run anywhere" convenience.
-
-### Running with Docker
-
-Quickly spin up the entire environment (Backend + Postgres) using Docker Compose:
-
-docker-compose up -d
 
 ### Local Installation
 
