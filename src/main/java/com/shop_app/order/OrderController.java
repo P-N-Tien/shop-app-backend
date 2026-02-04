@@ -1,7 +1,7 @@
 package com.shop_app.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shop_app.idempotency.IdempotencyService;
+import com.shop_app.idempotency.IdempotencyServiceImpl;
 import com.shop_app.order.request.CheckoutRequest;
 import com.shop_app.order.response.CheckoutResponse;
 import com.shop_app.order.response.OrderResponse;
@@ -17,16 +17,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${api.prefix}/orders")
 public class OrderController {
     private final IOrderService orderService;
-    private final IdempotencyService idempotencyService;
+    private final IdempotencyServiceImpl idempotencyService;
 
     @PostMapping("/checkout")
-    public ResponseEntity<?> checkout(
+    public ResponseEntity<CheckoutResponse> checkout(
             @RequestBody @Valid CheckoutRequest req,
             HttpServletRequest request
     ) {
+        // 1. Get keyId
         String keyId = (String) request.getAttribute("idempotencyKeyId");
 
-        // Execute business
+        // 2. Execute business
         CheckoutResponse checkoutResponse = orderService.checkout(req);
 
         // 3. Update Idempotency Key (Only Key was sent)
@@ -34,7 +35,7 @@ public class OrderController {
             try {
                 // Convert Response Body to String to storage.
                 ObjectMapper mapper = new ObjectMapper();
-                String responseBody = mapper.writeValueAsString(null);
+                String responseBody = mapper.writeValueAsString(checkoutResponse);
 
                 idempotencyService.markCompleted(keyId, responseBody);
             } catch (Exception e) {
@@ -42,7 +43,7 @@ public class OrderController {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(checkoutResponse);
+        return ResponseEntity.ok(checkoutResponse);
     }
 
     @GetMapping("/{id}")

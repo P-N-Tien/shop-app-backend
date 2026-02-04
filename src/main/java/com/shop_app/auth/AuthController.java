@@ -44,7 +44,6 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(
             @CookieValue(name = "refresh_token") String refreshToken
     ) {
-        System.out.println("refreshToken: " + refreshToken);
         TokenPair tokens = authService.refreshToken(refreshToken);
 
         String accessTokenNew = jwtCookieUtil.addAccessTokenCookie(tokens.accessToken());
