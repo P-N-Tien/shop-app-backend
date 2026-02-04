@@ -22,7 +22,7 @@ import java.util.Set;
 public class IdempotencyInterceptor implements HandlerInterceptor {
 
     private static final String IDEMPOTENCY_KEY_HEADER = "X-Idempotency-Key";
-    private static final Set<String> IDEMPOTENT_METHODS = Set.of("POST", "PUT", "PATCH");
+    private static final Set<String> IDEMPOTENT_METHODS = Set.of("POST", "PUT", "PATCH", "OPTIONS");
     private final IdempotencyService idempotencyService;
 
     @Override
